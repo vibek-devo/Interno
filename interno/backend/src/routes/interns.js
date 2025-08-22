@@ -12,6 +12,12 @@ router.get('/', authenticate, requireRole('admin', 'mentor'), async (_req, res) 
 	return res.json(list);
 });
 
+router.get('/me', authenticate, async (req, res) => {
+	const intern = await Intern.findOne({ user: req.user.id }).populate('user', 'email firstName lastName role');
+	if (!intern) return res.status(404).json({ error: 'Intern record not found' });
+	return res.json(intern);
+});
+
 router.post('/', authenticate, requireRole('admin'), async (req, res) => {
 	const created = await Intern.create(req.body);
 	return res.status(201).json(created);
